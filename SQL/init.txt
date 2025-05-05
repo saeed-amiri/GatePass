@@ -1,0 +1,9 @@
+DROP TABLE
+CREATE TABLE
+INSERT 0 2
+ id |  name   | age 
+----+---------+-----
+  1 | Neo     |  37
+  2 | Trinity |  35
+(2 rows)
+
