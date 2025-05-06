@@ -30,7 +30,7 @@ INSERT INTO users (name, age) VALUES ('Neo', 37), ('Trinity', 35);
 ```
 Saving this table in a cvs file:
 ```sql
-COPY users TO 'tmp/file.csv' DELIMITER ',' CSV HEADER;
+COPY users TO '/tmp/users.csv' WITH (FORMAT csv, HEADER);
 ```
 But only `/tmp` dir can be used, because `COPY` runs inside the PostgreSQL server:
 - Not your terminal, 
