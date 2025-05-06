@@ -37,7 +37,7 @@ QueryLens
     > movielens → name of the new database  
 - Create a new table called `movies` in the `movielens` database
     ```bash
-    psql -U postgres -d movielens -f schema.sql
+    sudo -u postgres psql -d movielens -f schema.sql
     ```
     > -U postgres → connect as the postgres user
     > -d movielens → connect to the movielens database
@@ -81,4 +81,30 @@ we did it for all the csv files:
  public | ratings | table | postgres
  public | tags    | table | postgres
 (4 rows)
+```
+
+**loads.sql**: Load the CSV files into the database
+```bash
+COPY movies FROM "\copy movies FROM 'data/movies.csv' DELIMITER ',' CSV HEADER;"
+COPY ratings FROM "data/ratings.csv" DELIMITER ',' CSV HEADER;
+COPY movies FROM "data/tags.csv" DELIMITER ',' CSV HEADER;
+COPY movies FROM "data/links.csv" DELIMITER ',' CSV HEADER;
+```
+> -c "\copy movies FROM 'data/movies.csv' DELIMITER ',' CSV HEADER;" → execute the command to copy the data from the movies.csv file into the movies table
+
+- To check if the data was loaded correctly
+```bash
+sudo -u postgres psql -d movielens -c "SELECT * FROM movies LIMIT 5;"
+```
+> -c "SELECT * FROM movies LIMIT 5;" → execute the command to select the first 5 rows from the movies table
+The output should look like this:
+```bash
+ movieid |               title                |                   genres                    
+---------+------------------------------------+---------------------------------------------
+       1 | Toy Story (1995)                   | Adventure|Animation|Children|Comedy|Fantasy
+       2 | Jumanji (1995)                     | Adventure|Children|Fantasy
+       3 | Grumpier Old Men (1995)            | Comedy|Romance
+       4 | Waiting to Exhale (1995)           | Comedy|Drama|Romance
+       5 | Father of the Bride Part II (1995) | Comedy
+(5 rows)
 ```
