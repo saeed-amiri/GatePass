@@ -30,20 +30,20 @@ QueryLens
 **schema.sql**: Manually inspect the CSV headers  
 
 - Create a new database called `movielens`
-    ´´´bash
+    ```bash
     sudo -u postgres createdb -O postgres movielens
     ```
     > -O postgres → make postgres the owner of the DB  
     > movielens → name of the new database  
 - Create a new table called `movies` in the `movielens` database
-    ´´´bash
+    ```bash
     psql -U postgres -d movielens -f schema.sql
     ```
     > -U postgres → connect as the postgres user
     > -d movielens → connect to the movielens database
     > -f schema.sql → execute the SQL commands in the schema.sql file
 - To see the tables in the database
-    ´´´bash
+    ```bash
     sudo -u postgres psql -d movielens -c "\dt"
     ```
     > -c "\dt" → execute the command to list the tables in the database
@@ -54,9 +54,9 @@ QueryLens
     --------+--------+-------+----------
      public | movies | table | postgres
     (1 row)
-    ´´´
+    ```
 - To see the columns in the 'movies' table
-    ´´´bash
+    ```bash
     sudo -u postgres psql -d movielens -c "\d movies"
     ```
     > -c "\d movies" → execute the command to describe the movies table
@@ -81,4 +81,4 @@ we did it for all the csv files:
  public | ratings | table | postgres
  public | tags    | table | postgres
 (4 rows)
-´´´
+```
