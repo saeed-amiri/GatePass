@@ -166,3 +166,44 @@ The output should look like this:
        5 | Father of the Bride Part II (1995) | Comedy
 (5 rows)
 ```
+
+## Correlated Subqueries
+```sql
+SELECT
+    title,
+    (
+        SELECT
+            AVG(rating)
+            FROM ratings WHERE ratings.movieid = movies.movieid
+    ) AS avg_rating
+FROM movies
+WHERE
+    (
+        SELECT
+            COUNT(*)
+            FROM ratings WHERE ratings.movieid = movies.movieid
+    ) > 100
+ORDER BY avg_rating DESC;
+```
+> - The subquery `(SELECT AVG(rating) FROM ratings WHERE ratings.movieid = movies.movieid)` calculates the average rating for each movie.
+> - The subquery `(SELECT COUNT(*) FROM ratings WHERE ratings.movieid = movies.movieid) > 100` filters the movies to only include those with more than 100 ratings. 
+> - The outer query selects the title and average rating of the movies that meet the criteria and orders them by average rating in descending order.
+
+### What is it? (geeks4geeks)[https://www.geeksforgeeks.org/sql-correlated-subqueries/]
+A correlated subquery is a subquery in SQL that refers to values from the outer query. The key difference between a correlated subquery and a regular subquery is that a correlated subquery is evaluated for each row processed by the outer query. This makes it dynamic, as it can return different results for each row depending on the values of the outer query.
+Key characteristics
+
+> - Row-by-Row Evaluation: The subquery is executed once for each row in the outer query.
+> - Dynamic and Dependent: The inner query uses values from the outer query, making it dependent on the outer query.
+> - Used for Complex Filtering: Correlated subqueries are commonly used for row-specific filtering, ranking, or calculations based on other related data.
+
+The syntax of a correlated subquery allows you to reference columns from the outer query inside the subquery. Here’s the basic structure:
+Syntax:
+```sql
+    SELECT column1, column2, ….
+    FROM table1 outer
+    WHERE column1 operator
+                        (SELECT column1, column2
+                         FROM table2
+                         WHERE expr1 = outer.expr2);
+```
