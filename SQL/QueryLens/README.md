@@ -6,6 +6,52 @@ This project uses the [MovieLens 100K Dataset](https://grouplens.org/datasets/mo
 > **Citation:**  
 > Harper, F. M., & Konstan, J. A. (2015). The MovieLens Datasets: History and Context. *ACM Transactions on Interactive Intelligent Systems (TiiS)*, 5(4), 1–19. [https://doi.org/10.1145/2827872](https://doi.org/10.1145/2827872)
 
+## Project Goal:
+
+> Use pure SQL (executed via terminal scripts) to explore, analyze, and manipulate MovieLens data stored in a PostgreSQL database.
+
+### This is a learning-focused, engineering-style SQL lab, aimed at:
+
+- Practicing schema design, loading, and querying  
+- Performing joins, groupings, filters, and calculations  
+- Producing clean outputs (eventually saved/exported) 
+Understood. No fluff.
+
+---
+
+##  What we're going to take out of the data:
+
+### 1. **Top Rated Movies**
+
+* Show movies with the highest average rating (with minimum votes)
+* Columns: `title`, `avg_rating`, `number_of_ratings`
+
+### 2. **Most Rated Movies**
+
+* Show which movies have been rated the most
+* Columns: `title`, `number_of_ratings`
+
+### 3. **User Activity**
+
+* See how many ratings each user gave
+* Columns: `userId`, `number_of_ratings`
+
+### 4. **Tag Usage**
+
+* Show the most frequently used tags
+* Columns: `tag`, `count`
+
+### 5. **Movie Genre Frequency**
+
+* Count how often each genre appears (requires parsing `genres` text)
+* Columns: `genre`, `count`
+
+### 6. **Year-Based Trends**
+
+* Extract year from movie titles (e.g., “(1995)”) and analyze average rating by year
+* Columns: `year`, `avg_rating`
+
+---
 
 
 ## Directory Structure
@@ -35,6 +81,18 @@ QueryLens
     ```
     > -O postgres → make postgres the owner of the DB  
     > movielens → name of the new database  
+- To drop the database if it already exists
+    ```bash
+    sudo -u postgres dropdb movielens
+    ```
+- To get list of databases
+    ```bash
+    sudo -u postgres psql -l
+    ```
+    or inside psql
+    ```sql
+    \l
+    ```
 - Create a new table called `movies` in the `movielens` database
     ```bash
     sudo -u postgres psql -d movielens -f schema.sql
