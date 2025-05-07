@@ -192,7 +192,7 @@ ORDER BY avg_rating DESC;
 > - The subquery `(SELECT COUNT(*) FROM ratings WHERE ratings.movieid = movies.movieid) > 100` filters the movies to only include those with more than 100 ratings. 
 > - The outer query selects the title and average rating of the movies that meet the criteria and orders them by average rating in descending order.
 
-### What is it? [geeks4geeks](https://www.geeksforgeeks.org/sql-correlated-subqueries/)
+### What is it? ([geeks4geeks](https://www.geeksforgeeks.org/sql-correlated-subqueries/))
 *A correlated subquery is a subquery in SQL that refers to values from the outer query. The key difference between a correlated subquery and a regular subquery is that a correlated subquery is evaluated for each row processed by the outer query. This makes it dynamic, as it can return different results for each row depending on the values of the outer query.*
 *Key characteristics*
 
