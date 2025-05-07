@@ -11,4 +11,4 @@ FROM ratings r
 JOIN movies m ON r.movieId = m.movieId
 GROUP BY m.movieId, m.title
 ORDER BY rating_count DESC
-LIMIT 10;
+FETCH FIRST 10 ROWS ONLY;  -- Same as LIMIT 10;
