@@ -6,6 +6,52 @@ This project uses the [MovieLens 100K Dataset](https://grouplens.org/datasets/mo
 > **Citation:**  
 > Harper, F. M., & Konstan, J. A. (2015). The MovieLens Datasets: History and Context. *ACM Transactions on Interactive Intelligent Systems (TiiS)*, 5(4), 1–19. [https://doi.org/10.1145/2827872](https://doi.org/10.1145/2827872)
 
+## Project Goal:
+
+> Use pure SQL (executed via terminal scripts) to explore, analyze, and manipulate MovieLens data stored in a PostgreSQL database.
+
+### This is a learning-focused, engineering-style SQL lab, aimed at:
+
+- Practicing schema design, loading, and querying  
+- Performing joins, groupings, filters, and calculations  
+- Producing clean outputs (eventually saved/exported) 
+Understood. No fluff.
+
+---
+
+##  What we're going to take out of the data:
+
+### 1. **Top Rated Movies**
+
+* Show movies with the highest average rating (with minimum votes)
+* Columns: `title`, `avg_rating`, `number_of_ratings`
+
+### 2. **Most Rated Movies**
+
+* Show which movies have been rated the most
+* Columns: `title`, `number_of_ratings`
+
+### 3. **User Activity**
+
+* See how many ratings each user gave
+* Columns: `userId`, `number_of_ratings`
+
+### 4. **Tag Usage**
+
+* Show the most frequently used tags
+* Columns: `tag`, `count`
+
+### 5. **Movie Genre Frequency**
+
+* Count how often each genre appears (requires parsing `genres` text)
+* Columns: `genre`, `count`
+
+### 6. **Year-Based Trends**
+
+* Extract year from movie titles (e.g., “(1995)”) and analyze average rating by year
+* Columns: `year`, `avg_rating`
+
+---
 
 
 ## Directory Structure
@@ -35,6 +81,18 @@ QueryLens
     ```
     > -O postgres → make postgres the owner of the DB  
     > movielens → name of the new database  
+- To drop the database if it already exists
+    ```bash
+    sudo -u postgres dropdb movielens
+    ```
+- To get list of databases
+    ```bash
+    sudo -u postgres psql -l
+    ```
+    or inside psql
+    ```sql
+    \l
+    ```
 - Create a new table called `movies` in the `movielens` database
     ```bash
     sudo -u postgres psql -d movielens -f schema.sql
@@ -107,4 +165,48 @@ The output should look like this:
        4 | Waiting to Exhale (1995)           | Comedy|Drama|Romance
        5 | Father of the Bride Part II (1995) | Comedy
 (5 rows)
+```
+
+---
+---
+
+## Correlated Subqueries
+```sql
+SELECT
+    title,
+    (
+        SELECT
+            AVG(rating)
+            FROM ratings WHERE ratings.movieid = movies.movieid
+    ) AS avg_rating
+FROM movies
+WHERE
+    (
+        SELECT
+            COUNT(*)
+            FROM ratings WHERE ratings.movieid = movies.movieid
+    ) > 100
+ORDER BY avg_rating DESC;
+```
+> - The subquery `(SELECT AVG(rating) FROM ratings WHERE ratings.movieid = movies.movieid)` calculates the average rating for each movie.
+> - The subquery `(SELECT COUNT(*) FROM ratings WHERE ratings.movieid = movies.movieid) > 100` filters the movies to only include those with more than 100 ratings. 
+> - The outer query selects the title and average rating of the movies that meet the criteria and orders them by average rating in descending order.
+
+### What is it? ([geeks4geeks](https://www.geeksforgeeks.org/sql-correlated-subqueries/))
+*A correlated subquery is a subquery in SQL that refers to values from the outer query. The key difference between a correlated subquery and a regular subquery is that a correlated subquery is evaluated for each row processed by the outer query. This makes it dynamic, as it can return different results for each row depending on the values of the outer query.*
+*Key characteristics*
+
+> - *Row-by-Row Evaluation: The subquery is executed once for each row in the outer query.*
+> - *Dynamic and Dependent: The inner query uses values from the outer query, making it dependent on the outer query.*
+> - *Used for Complex Filtering: Correlated subqueries are commonly used for row-specific filtering, ranking, or calculations based on other related data.*
+
+*The syntax of a correlated subquery allows you to reference columns from the outer query inside the subquery. Here’s the basic structure:*
+*Syntax:*
+```sql
+    SELECT column1, column2, ….
+    FROM table1 outer
+    WHERE column1 operator
+                        (SELECT column1, column2
+                         FROM table2
+                         WHERE expr1 = outer.expr2);
 ```
