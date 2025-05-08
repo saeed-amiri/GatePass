@@ -182,7 +182,8 @@ WHERE rating > (
 ```
 > - The subquery `(SELECT AVG(rating) FROM movies)` calculates the average rating of all movies.
 > - The outer query selects the title and rating of movies that have a rating greater than the average rating calculated by the subquery.
-> - The result will show the titles and ratings of movies that are above the average rating.
+> - The result will show the titles and ratings of movies that are above the average rating.  
+
 Now, we add movie title to the query:
 ```sql
 SELECT m.movieId, m.title, rating_count
@@ -251,27 +252,31 @@ WHERE column1 operator
 4. **Correlated subquery**: A subquery that references columns from the outer query, evaluated for each row processed by the outer query.
 5. **Nested subquery**: A subquery within another subquery, allowing for complex queries that require multiple levels of filtering or aggregation.
 
+---
+---
 
-## Correlated Subqueries
+## SQL Correlated Subqueries
 ```sql
 SELECT
     title,
     (
         SELECT
             AVG(rating)
-            FROM ratings WHERE ratings.movieid = movies.movieid
+            FROM ratings
+            WHERE ratings.movieid = movies.movieid
     ) AS avg_rating
 FROM movies
 WHERE
     (
         SELECT
             COUNT(*)
-            FROM ratings WHERE ratings.movieid = movies.movieid
+            FROM ratings
+            WHERE ratings.movieid = movies.movieid
     ) > 100
 ORDER BY avg_rating DESC;
 ```
 > - The subquery `(SELECT AVG(rating) FROM ratings WHERE ratings.movieid = movies.movieid)` calculates the average rating for each movie.
-> - The subquery `(SELECT COUNT(*) FROM ratings WHERE ratings.movieid = movies.movieid) > 100` filters the movies to only include those with more than 100 ratings. 
+> - The subquery `(SELECT COUNT(*) FROM ratings WHERE ratings.movieid = movies.movieid) > 100` filters the movies to only include those with more than 100 ratings.
 > - The outer query selects the title and average rating of the movies that meet the criteria and orders them by average rating in descending order.
 
 ### What is it? ([geeks4geeks](https://www.geeksforgeeks.org/sql-correlated-subqueries/))

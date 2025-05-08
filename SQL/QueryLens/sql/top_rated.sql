@@ -14,7 +14,8 @@ ORDER BY rating_count DESC
 FETCH FIRST 10 ROWS ONLY;  -- Same as LIMIT 10;
 
 /*
-Getting the movies which has rating number bigger than the average rating
+Getting the movies which has rating number bigger than the average rating,
+"subqueries" (see README)
 */
 
 WITH movie_ratings AS (
@@ -35,7 +36,7 @@ LIMIT 10;
 
 
 /*
- - The same, but this time add tags from tag to it
+ - This time add tags from tag to it
  - It gives a long rows, which forced into vim!
  - So we add a limitation to it
  - It is called "correlated subqueries" (see README)
