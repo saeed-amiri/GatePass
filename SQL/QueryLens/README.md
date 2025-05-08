@@ -170,26 +170,113 @@ The output should look like this:
 ---
 ---
 
-## Correlated Subqueries
+## SQL Subqueries
+In the example below, we want to find the movies which have the rating number greater than the average rating of all movies. We can do this using a subquery.
+```sql
+SELECT title, rating
+FROM movies
+WHERE rating > (
+    SELECT AVG(rating)
+    FROM movies
+);
+```
+> - The subquery `(SELECT AVG(rating) FROM movies)` calculates the average rating of all movies.
+> - The outer query selects the title and rating of movies that have a rating greater than the average rating calculated by the subquery.
+> - The result will show the titles and ratings of movies that are above the average rating.  
+
+Now, we add movie title to the query:
+```sql
+SELECT m.movieId, m.title, rating_count
+FROM (
+    SELECT movieId, COUNT(*) AS rating_count
+    FROM ratings
+    GROUP BY movieId
+) AS subquery
+JOIN movies m ON subquery.movieId = m.movieId
+WHERE rating_count > (
+    SELECT AVG(rating_count)
+    FROM (
+        SELECT movieId, COUNT(*) AS rating_count
+        FROM ratings t
+        GROUP BY movieId
+    ) AS avg_subquery
+)
+ORDER BY rating_count DESC
+LIMIT 10;
+```
+> - The subquery `(SELECT movieId, COUNT(*) AS rating_count FROM ratings GROUP BY movieId)` counts the number of ratings for each movie.
+> - The outer query joins the subquery with the movies table to get the movie titles.
+> - The `WHERE` clause filters the movies to only include those with a rating count greater than the average rating count calculated by the subquery.
+> - The result will show the top 10 movies with the highest rating counts that are above the average rating count.
+
+However there is an issuue with this query. The `CONUT(*)` function is used twice in the query. This is not efficient and can be improved by using a `WITH` clause to create a common table expression (CTE) that can be referenced multiple times in the query. Here’s how you can rewrite the query using a CTE:
+```sql
+WITH movie_ratings AS (
+    SELECT movieId, COUNT(*) AS rating_count
+    FROM ratings
+    GROUP BY movieId
+),
+average_rating AS (
+    SELECT AVG(rating_count) AS avg_rating
+    FROM movie_ratings
+)
+SELECT m.movieId, m.title, mr.rating_count
+FROM movie_ratings mr
+JOIN movies m ON mr.movieId = m.movieId
+JOIN average_rating ar ON mr.rating_count > ar.avg_rating
+ORDER BY mr.rating_count DESC
+LIMIT 10;
+```
+> - The `WITH` clause creates two CTEs: `movie_ratings` and `average_rating`.
+> - The `movie_ratings` CTE counts the number of ratings for each movie.
+> - The `average_rating` CTE calculates the average rating count from the `movie_ratings` CTE.
+> - The outer query joins the `movie_ratings` CTE with the `movies` table to get the movie titles and filters the movies to only include those with a rating count greater than the average rating count calculated by the `average_rating` CTE.
+> - The result will show the top 10 movies with the highest rating counts that are above the average rating count, using a more efficient approach with CTEs.
+
+#### The General Form of a Subquery
+```sql
+SELECT column1, column2, ...
+FROM table1
+WHERE column1 operator
+                    (SELECT column1, column2
+                     FROM table2
+                     WHERE expr1 = expr2);
+```
+> - The outer query selects columns from `table1` where `column1` meets a condition defined by the subquery.
+> - The subquery selects columns from `table2` based on a condition that relates to the outer query.
+> - The `operator` can be any comparison operator (e.g., `=`, `>`, `<`, `IN`, `EXISTS`, etc.).
+### Types of Subqueries
+1. **Single-row subquery**: Returns a single row and can be used with comparison operators like `=`, `<`, `>`, etc.
+2. **Multiple-row subquery**: Returns multiple rows and can be used with operators like `IN`, `ANY`, or `ALL`.
+3. **Scalar subquery**: Returns a single value (one column and one row) and can be used in the `SELECT` list or `WHERE` clause.
+4. **Correlated subquery**: A subquery that references columns from the outer query, evaluated for each row processed by the outer query.
+5. **Nested subquery**: A subquery within another subquery, allowing for complex queries that require multiple levels of filtering or aggregation.
+
+---
+---
+
+## SQL Correlated Subqueries
 ```sql
 SELECT
     title,
     (
         SELECT
             AVG(rating)
-            FROM ratings WHERE ratings.movieid = movies.movieid
+            FROM ratings
+            WHERE ratings.movieid = movies.movieid
     ) AS avg_rating
 FROM movies
 WHERE
     (
         SELECT
             COUNT(*)
-            FROM ratings WHERE ratings.movieid = movies.movieid
+            FROM ratings
+            WHERE ratings.movieid = movies.movieid
     ) > 100
 ORDER BY avg_rating DESC;
 ```
 > - The subquery `(SELECT AVG(rating) FROM ratings WHERE ratings.movieid = movies.movieid)` calculates the average rating for each movie.
-> - The subquery `(SELECT COUNT(*) FROM ratings WHERE ratings.movieid = movies.movieid) > 100` filters the movies to only include those with more than 100 ratings. 
+> - The subquery `(SELECT COUNT(*) FROM ratings WHERE ratings.movieid = movies.movieid) > 100` filters the movies to only include those with more than 100 ratings.
 > - The outer query selects the title and average rating of the movies that meet the criteria and orders them by average rating in descending order.
 
 ### What is it? ([geeks4geeks](https://www.geeksforgeeks.org/sql-correlated-subqueries/))
