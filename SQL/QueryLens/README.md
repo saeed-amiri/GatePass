@@ -170,6 +170,35 @@ The output should look like this:
 ---
 ---
 
+## SQL Windows
+*SQL **Windows** is a function that performs calculations across a set of rows related to the current row, without grouping the results into a single output row. They are distinct from aggregate functions because they return a value for each row in the result set.*
+### Example
+```sql
+WITH user_max_ratings AS (
+    SELECT
+        r.userId,
+        r.movieId,
+        r.rating,
+        ROW_NUMBER() OVER (PARTITION BY r.userId ORDER BY r.rating DESC) AS rank
+    FROM ratings r
+)
+SELECT
+    umr.userId,
+    umr.rating AS highest_rating,
+    m.title
+FROM user_max_ratings umr
+JOIN movies m ON umr.movieId = m.movieId
+WHERE umr.rank = 1
+ORDER BY umr.userId
+LIMIT 10;
+```
+In this example we want to find what is the movie which the user how rated the most, gave the highest rating.
+> - The `WITH` clause creates a common table expression (CTE) called `user_max_ratings` that calculates the rank of each rating for each user using the `ROW_NUMBER()` window function.
+> - The `PARTITION BY` clause divides the result set into partitions based on the `userId`, and the `ORDER BY` clause orders the ratings within each partition in descending order.
+> - The outer query selects the user ID, highest rating, and movie title from the `user_max_ratings` CTE and joins it with the `movies` table to get the movie titles.
+
+
+
 ## SQL Subqueries
 In the example below, we want to find the movies which have the rating number greater than the average rating of all movies. We can do this using a subquery.
 ```sql
