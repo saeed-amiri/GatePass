@@ -3,3 +3,7 @@
 *.pdf
 superset_config.py
 __pycache__git
+*.pyc
+__pycache__/
+*.py[cod]
+*$py.class
